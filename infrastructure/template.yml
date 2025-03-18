@@ -1,0 +1,30 @@
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  OriginUrl:
+    Type: String
+    Description: The URL of the origin calendar
+  AttendeeEmail:
+    Type: String
+    Description: The email of the attendee to transform the calendar for
+  Timezone:
+    Type: String
+    Description: The timezone to use when converting date-time values to date values
+Resources:
+  DiscordInteractionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: ../dist
+      MemorySize: 512
+      Timeout: 30
+      FunctionUrlConfig:
+        AuthType: NONE
+      Environment:
+        Variables:
+          ORIGIN_URL: !Ref OriginUrl
+          ATTENDEE_EMAIL: !Ref AttendeeEmail
+          TIMEZONE: !Ref Timezone
+Outputs:
+  DiscordInteractionsFunctionUrl:
+    Value: !GetAtt DiscordInteractionsFunctionUrl.FunctionUrl

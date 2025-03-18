@@ -1,0 +1,25 @@
+{
+  "name": "csv-transformer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "Rien Stenekes",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/luxon": "^3.4.2",
+    "@types/node": "^22.10.10",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.2",
+    "vitest": "^3.0.9"
+  },
+  "dependencies": {
+    "ical.js": "^2.1.0",
+    "luxon": "^3.5.0"
+  }
+}

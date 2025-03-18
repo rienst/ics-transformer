@@ -1,0 +1,46 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ vars.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ORIGIN_URL: ${{ secrets.ORIGIN_URL }}
+  ATTENDEE_EMAIL: ${{ vars.ATTENDEE_EMAIL }}
+  TIMEZONE: ${{ vars.TIMEZONE }}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/setup-sam@v2
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '18.19.0'
+
+      - run: npm install --package-lock=false
+
+      - run: npm run build
+
+      - run: |
+          sam build
+          sam deploy --parameter-overrides OriginUrl=$ORIGIN_URL,AttendeeEmail=$ATTENDEE_EMAIL,Timezone=$TIMEZONE --region $AWS_REGION --no-fail-on-empty-changeset
+        working-directory: infrastructure
