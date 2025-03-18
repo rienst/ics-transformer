@@ -42,5 +42,5 @@ jobs:
 
       - run: |
           sam build
-          sam deploy --parameter-overrides OriginUrl=$ORIGIN_URL,AttendeeEmail=$ATTENDEE_EMAIL,Timezone=$TIMEZONE --region $AWS_REGION --no-fail-on-empty-changeset
+          sam deploy --parameter-overrides OriginUrl=$ORIGIN_URL AttendeeEmail=$ATTENDEE_EMAIL Timezone=$TIMEZONE --region $AWS_REGION --no-fail-on-empty-changeset
         working-directory: infrastructure
