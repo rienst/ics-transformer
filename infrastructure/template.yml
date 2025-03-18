@@ -10,7 +10,7 @@ Parameters:
     Type: String
     Description: The timezone to use when converting date-time values to date values
 Resources:
-  DiscordInteractionsFunction:
+  CalendarFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
@@ -26,5 +26,5 @@ Resources:
           ATTENDEE_EMAIL: !Ref AttendeeEmail
           TIMEZONE: !Ref Timezone
 Outputs:
-  DiscordInteractionsFunctionUrl:
-    Value: !GetAtt DiscordInteractionsFunctionUrl.FunctionUrl
+  CalendarFunctionUrl:
+    Value: !GetAtt CalendarFunctionUrl.FunctionUrl
