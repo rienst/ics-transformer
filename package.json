@@ -4,6 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsup",
+    "build:standalone": "tsup -- standalone",
+    "start": "node dist/standalone.js",
     "test": "vitest"
   },
   "keywords": [],

@@ -10,7 +10,7 @@ const ORIGIN_URL = process.env.ORIGIN_URL
 const ATTENDEE_EMAIL = process.env.ATTENDEE_EMAIL
 const TIMEZONE = process.env.TIMEZONE
 
-export const handler: LambdaFunctionURLHandler = async () => {
+export async function main() {
   if (!ORIGIN_URL || !ATTENDEE_EMAIL || !TIMEZONE) {
     throw new Error(
       'Missing env variables' +
@@ -26,7 +26,7 @@ export const handler: LambdaFunctionURLHandler = async () => {
 
   transformMany(events, [
     updateStatusByPartstat(ATTENDEE_EMAIL),
-    multiDayToAllDay(),
+    multiDayToAllDay(TIMEZONE),
   ])
 
   const nonDeclinedEvents = removeDeclined(events, ATTENDEE_EMAIL)
@@ -34,9 +34,15 @@ export const handler: LambdaFunctionURLHandler = async () => {
   calendar.removeAllSubcomponents('vevent')
   nonDeclinedEvents.forEach(event => calendar.addSubcomponent(event.component))
 
+  return ICAL.stringify(calendar.jCal)
+}
+
+export const handler: LambdaFunctionURLHandler = async () => {
+  const body = await main()
+
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'text/calendar' },
-    body: ICAL.stringify(calendar.jCal),
+    body,
   }
 }
