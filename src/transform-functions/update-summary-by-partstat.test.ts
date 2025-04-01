@@ -8,9 +8,7 @@ describe('updateStatusByPartstat', () => {
 
   beforeEach(() => {
     event = {
-      component: {
-        updatePropertyWithValue: vi.fn(),
-      },
+      summary: 'Test event',
     }
   })
 
@@ -22,13 +20,13 @@ describe('updateStatusByPartstat', () => {
     expect(typeof transformFn).toBe('function')
   })
 
-  it('does not change the event status if the user is not an attendee', () => {
+  it('does not prefix the event summary if the user is not an attendee', () => {
     transformFn(event)
 
-    expect(event.component.updatePropertyWithValue).not.toHaveBeenCalled()
+    expect(event.summary).toBe('Test event')
   })
 
-  it('does not change the event if the attendee partstat is ACCEPTED', () => {
+  it('does not prefix the event summary if the attendee partstat is ACCEPTED', () => {
     event.attendees = [
       {
         getFirstParameter: (name: string) => {
@@ -45,10 +43,10 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.component.updatePropertyWithValue).not.toHaveBeenCalled()
+    expect(event.summary).toBe('Test event')
   })
 
-  it('does not change the event if the attendee partstat is not DELEGATED', () => {
+  it('does not prefix the event summary if the attendee partstat is DELEGATED', () => {
     event.attendees = [
       {
         getFirstParameter: (name: string) => {
@@ -65,10 +63,10 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.component.updatePropertyWithValue).not.toHaveBeenCalled()
+    expect(event.summary).toBe('Test event')
   })
 
-  it('changes the event status to TENTATIVE if the attendee partstat is NEEDS-ACTION', () => {
+  it('prefixes the event summary if the attendee partstat is NEEDS-ACTION', () => {
     event.attendees = [
       {
         getFirstParameter: (name: string) => {
@@ -85,13 +83,10 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.component.updatePropertyWithValue).toHaveBeenCalledWith(
-      'status',
-      'TENTATIVE'
-    )
+    expect(event.summary).toBe('🔵 Uitnodiging: Test event')
   })
 
-  it('changes the event status to TENTATIVE if the attendee partstat is TENTATIVE', () => {
+  it('prefixes the event summary if the attendee partstat is TENTATIVE', () => {
     event.attendees = [
       {
         getFirstParameter: (name: string) => {
@@ -108,13 +103,10 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.component.updatePropertyWithValue).toHaveBeenCalledWith(
-      'status',
-      'TENTATIVE'
-    )
+    expect(event.summary).toBe('🟡 Misschien: Test event')
   })
 
-  it('changes the event status to CANCELLED if the attendee partstat is DECLINED', () => {
+  it('prefixes the event summary if the attendee partstat is DECLINED', () => {
     event.attendees = [
       {
         getFirstParameter: (name: string) => {
@@ -131,9 +123,6 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.component.updatePropertyWithValue).toHaveBeenCalledWith(
-      'status',
-      'CANCELLED'
-    )
+    expect(event.summary).toBe('🔴 Afgewezen: Test event')
   })
 })

@@ -1,4 +1,4 @@
-import { updateStatusByPartstat } from './transform-functions/update-status-by-partstat'
+import { updateSummaryByPartstat } from './transform-functions/update-summary-by-partstat'
 import { transformMany } from './transform-functions'
 import { multiDayToAllDay } from './transform-functions/multi-day-to-all-day'
 import { fetchOriginCalendar } from './fetch-origin-calendar'
@@ -25,7 +25,7 @@ export async function main() {
     .map(component => new ICAL.Event(component))
 
   transformMany(events, [
-    updateStatusByPartstat(ATTENDEE_EMAIL),
+    updateSummaryByPartstat(ATTENDEE_EMAIL),
     multiDayToAllDay(TIMEZONE),
   ])
 

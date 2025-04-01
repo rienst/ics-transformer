@@ -1,7 +1,7 @@
 import { TransformFn } from '.'
 import ICAL from 'ical.js'
 
-export function updateStatusByPartstat(
+export function updateSummaryByPartstat(
   attendeeEmail: string
 ): TransformFn<ICAL.Event> {
   return event => {
@@ -13,20 +13,20 @@ export function updateStatusByPartstat(
       return event
     }
 
-    const partstatToStatus = new Map([
-      ['TENTATIVE', 'TENTATIVE'],
-      ['NEEDS-ACTION', 'TENTATIVE'],
-      ['DECLINED', 'CANCELLED'],
+    const partstatToLabel = new Map([
+      ['TENTATIVE', '🟡 Misschien'],
+      ['NEEDS-ACTION', '🔵 Uitnodiging'],
+      ['DECLINED', '🔴 Afgewezen'],
     ])
 
     const partstat = attendee?.getFirstParameter('partstat')
-    const updatedStatus = partstat && partstatToStatus.get(partstat)
+    const label = partstat && partstatToLabel.get(partstat)
 
-    if (!updatedStatus) {
+    if (!label) {
       return event
     }
 
-    event.component.updatePropertyWithValue('status', updatedStatus)
+    event.summary = [label, event.summary].join(': ')
 
     return event
   }
