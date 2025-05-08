@@ -8,13 +8,20 @@ import { LambdaFunctionURLHandler } from 'aws-lambda'
 
 const ORIGIN_URL = process.env.ORIGIN_URL
 const ATTENDEE_EMAIL = process.env.ATTENDEE_EMAIL
-const TIMEZONE = process.env.TIMEZONE
+const TIMEZONE = process.env.TIMEZONE || 'Europe/Amsterdam'
 
 export async function main() {
-  if (!ORIGIN_URL || !ATTENDEE_EMAIL || !TIMEZONE) {
+  if (!ORIGIN_URL || !ATTENDEE_EMAIL) {
     throw new Error(
-      'Missing env variables' +
-        JSON.stringify({ ORIGIN_URL, ATTENDEE_EMAIL, TIMEZONE }, null, 2)
+      'Missing env variables: ' +
+        JSON.stringify(
+          {
+            ORIGIN_URL: ORIGIN_URL || null,
+            ATTENDEE_EMAIL: ATTENDEE_EMAIL || null,
+          },
+          null,
+          2
+        )
     )
   }
 

@@ -2,6 +2,8 @@ import { createServer } from 'http'
 import { main } from './index'
 
 const server = createServer(async (_, res) => {
+  console.log('Request received')
+
   const body = await main()
 
   res.statusCode = 200

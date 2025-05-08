@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { updateStatusByPartstat } from './update-status-by-partstat'
+import { updateSummaryByPartstat } from './update-summary-by-partstat'
 
 describe('updateStatusByPartstat', () => {
   const attendeeEmail = 'user@example.com'
-  const transformFn = updateStatusByPartstat(attendeeEmail)
+  const transformFn = updateSummaryByPartstat(attendeeEmail)
   let event
 
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe('updateStatusByPartstat', () => {
   })
 
   it('exists', () => {
-    expect(updateStatusByPartstat).toBeDefined()
+    expect(updateSummaryByPartstat).toBeDefined()
   })
 
   it('returns a function', () => {
