@@ -15,26 +15,22 @@ export function removeDeclined(events: ICAL.Event[], attendeeEmail: string) {
       return
     }
 
-    console.log('\nevent is declined:', event.uid)
+    const hasRelatedRecurringEvents = !!event.recurrenceId
 
-    const hasRecurrenceId = !!event.recurrenceId
-
-    if (!hasRecurrenceId) {
+    if (!hasRelatedRecurringEvents) {
       return
     }
 
-    console.log('event has recurrence id:', event.recurrenceId.toICALString())
+    const exdateProperty = new ICAL.Property('EXDATE')
+    exdateProperty.setParameter('TZID', 'Europe/Brussels')
+    exdateProperty.setValue(event.startDate.toICALString())
 
-    const relatedEvents = transformedEvents.filter(recurringEvent =>
-      recurringEvent.uid.startsWith(event.uid.split('_')[0])
+    const eventsWithSameUidStart = transformedEvents.filter(e =>
+      e.uid.startsWith(event.uid.split('_')[0])
     )
 
-    relatedEvents.forEach(initialRecurringEvent => {
-      const exdateProperty = new ICAL.Property('EXDATE')
-      exdateProperty.setParameter('TZID', 'Europe/Brussels')
-      exdateProperty.setValue(event.startDate.toICALString())
-
-      initialRecurringEvent.component.addProperty(exdateProperty)
+    eventsWithSameUidStart.forEach(relatedEvent => {
+      relatedEvent.component.addProperty(exdateProperty)
     })
   })
 
