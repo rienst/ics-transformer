@@ -38,6 +38,8 @@ jobs:
 
       - run: npm install --package-lock=false
 
+      - run: npm test
+
       - run: npm run build
 
       - run: |
