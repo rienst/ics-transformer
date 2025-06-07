@@ -1,19 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { updateSummaryByPartstat } from './update-summary-by-partstat'
+import { updateEventByPartstat } from './update-event-by-partstat'
 
 describe('updateStatusByPartstat', () => {
   const attendeeEmail = 'user@example.com'
-  const transformFn = updateSummaryByPartstat(attendeeEmail)
+  const addPropertyWithValue = vi.fn()
+  const transformFn = updateEventByPartstat(attendeeEmail)
   let event
 
   beforeEach(() => {
     event = {
       summary: 'Test event',
+      component: {
+        addPropertyWithValue,
+      },
     }
+
+    addPropertyWithValue.mockClear()
   })
 
   it('exists', () => {
-    expect(updateSummaryByPartstat).toBeDefined()
+    expect(updateEventByPartstat).toBeDefined()
   })
 
   it('returns a function', () => {
@@ -83,7 +89,7 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.summary).toBe('🔵 Uitnodiging: Test event')
+    expect(event.summary).toBe('[Uitnodiging] Test event')
   })
 
   it('prefixes the event summary if the attendee partstat is TENTATIVE', () => {
@@ -103,10 +109,10 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.summary).toBe('🟡 Misschien: Test event')
+    expect(event.summary).toBe('[Misschien] Test event')
   })
 
-  it('prefixes the event summary if the attendee partstat is DECLINED', () => {
+  it('does not prefix the event summary if the attendee partstat is DECLINED', () => {
     event.attendees = [
       {
         getFirstParameter: (name: string) => {
@@ -123,6 +129,26 @@ describe('updateStatusByPartstat', () => {
 
     transformFn(event)
 
-    expect(event.summary).toBe('🔴 Afgewezen: Test event')
+    expect(event.summary).toBe('Test event')
+  })
+
+  it('marks the entire event as CANCELLED if the attendee partstat is DECLINED', () => {
+    event.attendees = [
+      {
+        getFirstParameter: (name: string) => {
+          if (name === 'cn') {
+            return attendeeEmail
+          }
+
+          if (name === 'partstat') {
+            return 'DECLINED'
+          }
+        },
+      },
+    ]
+
+    transformFn(event)
+
+    expect(addPropertyWithValue).toHaveBeenCalledWith('STATUS', 'CANCELLED')
   })
 })

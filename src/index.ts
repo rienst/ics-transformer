@@ -1,9 +1,8 @@
-import { updateSummaryByPartstat } from './transform-functions/update-summary-by-partstat'
+import { updateEventByPartstat } from './transform-functions/update-event-by-partstat'
 import { transformMany } from './transform-functions'
 import { multiDayToAllDay } from './transform-functions/multi-day-to-all-day'
 import { fetchOriginCalendar } from './fetch-origin-calendar'
 import ICAL from 'ical.js'
-import { removeDeclined } from './remove-declined'
 import { LambdaFunctionURLHandler } from 'aws-lambda'
 
 const ORIGIN_URL = process.env.ORIGIN_URL
@@ -11,6 +10,10 @@ const ATTENDEE_EMAIL = process.env.ATTENDEE_EMAIL
 const TIMEZONE = process.env.TIMEZONE || 'Europe/Amsterdam'
 
 export async function main() {
+  console.log(
+    `Starting calendar transformation for ${ATTENDEE_EMAIL} from ${ORIGIN_URL}`
+  )
+
   if (!ORIGIN_URL || !ATTENDEE_EMAIL) {
     throw new Error(
       'Missing env variables: ' +
@@ -27,19 +30,25 @@ export async function main() {
 
   const calendar = await fetchOriginCalendar({ url: ORIGIN_URL })
 
+  console.log(
+    `Fetched calendar with ${
+      calendar.getAllSubcomponents('vevent').length
+    } events`
+  )
+
   const events = calendar
     .getAllSubcomponents('vevent')
     .map(component => new ICAL.Event(component))
 
   transformMany(events, [
-    updateSummaryByPartstat(ATTENDEE_EMAIL),
+    updateEventByPartstat(ATTENDEE_EMAIL),
     multiDayToAllDay(TIMEZONE),
   ])
 
-  const nonDeclinedEvents = removeDeclined(events, ATTENDEE_EMAIL)
-
   calendar.removeAllSubcomponents('vevent')
-  nonDeclinedEvents.forEach(event => calendar.addSubcomponent(event.component))
+  events.forEach(event => calendar.addSubcomponent(event.component))
+
+  console.log(`Transformed calendar with ${events.length} events`)
 
   return ICAL.stringify(calendar.jCal)
 }
